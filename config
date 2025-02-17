@@ -1,0 +1,186 @@
+# for reference https://i3wm.org/docs/userguide.html 
+
+# set Mod4 (windows key) to modifier
+set $mod Mod4
+
+####################################
+# STARTUP APPLICATIONS AND OPTIONS #
+####################################
+
+# autorandr for display setup
+exec_always --no-startup-id autorandr --change
+
+# XDG autostart
+exec --no-startup-id dex-autostart --autostart --environment i3
+
+# xss-lock
+exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
+
+# networkmanager (for wifi config)
+exec --no-startup-id nm-applet
+
+# Use pactl to adjust volume in PulseAudio.
+set $refresh_i3status killall -SIGUSR1 i3status
+bindsym $mod+Shift+plus exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
+bindsym $mod+Shift+minus exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10% && $refresh_i3status
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
+bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
+
+# wallpaper
+exec_always --no-startup-id ~/.config/i3/nitrogen.sh
+
+##############
+# WORKSPACES #
+##############
+
+# switch to workspaces
+bindsym $mod+bracketleft workspace 1
+bindsym $mod+bracketright workspace 2
+bindsym $mod+9 workspace 3
+bindsym $mod+0 workspace 4
+
+# move focused container to workspaces
+bindsym $mod+Shift+bracketleft move container to workspace number 1; workspace number 1
+bindsym $mod+Shift+bracketright move container to workspace number 2; workspace number 2
+bindsym $mod+Shift+9 move container to workspace number 3
+bindsym $mod+Shift+0 move container to workspace number 4
+
+# define workspace outputs
+workspace 1 output DP-4
+workspace 2 output HDMI-2
+workspace 3 output DP-4
+workspace 4 output DP-4
+
+###############
+# KEYBINDINGS #
+###############
+
+# reload the configuration file
+bindsym $mod+Shift+c reload
+# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $mod+Shift+r restart
+# exit mode 
+mode "Exit: [l]ogout, [r]eboot, [s]hutdown" {
+    bindsym l exec i3-msg exit
+    bindsym r exec systemctl reboot
+    bindsym s exec systemctl shutdown
+    bindsym Escape mode "default"
+    bindsym Return mode "default"
+    bindsym q mode "default"
+}
+bindsym $mod+Shift+q mode "Exit: [l]ogout, [r]eboot, [s]hutdown"
+
+# toggle tiling / floating
+bindsym $mod+space floating toggle
+
+# to drag windows around
+floating_modifier $mod
+
+# toggle fullscreen on active container
+bindsym $mod+f fullscreen toggle
+
+# split in horizontal orientation
+bindsym $mod+p split h
+
+# split in vertical orientation
+bindsym $mod+o split v
+
+# kill focused window
+bindsym $mod+c kill
+
+# start terminal (kitty)
+bindsym $mod+Return exec kitty
+
+# start browser (firefox)
+bindsym $mod+n exec firefox
+bindsym $mod+Shift+n workspace number 2; exec firefox
+
+# start file explorer (dolphin)
+bindsym $mod+d exec dolphin
+
+# start app launcher (rofi)
+bindsym $mod+r exec --no-startup-id "rofi -modi drun,run -show drun"
+
+# change focus (vim or arrow keys)
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# move focused window (vim or arrow keys)
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+# resize window 
+mode "resize" {
+        bindsym l exec python ~/.config/i3/resize.py right 50
+        bindsym k exec python ~/.config/i3/resize.py up 50
+        bindsym j exec python ~/.config/i3/resize.py down 50 
+        bindsym h exec python ~/.config/i3/resize.py left 50
+        bindsym Left exec python ~/.config/i3/resize.py left 50
+        bindsym Down exec python ~/.config/i3/resize.py down 50 
+        bindsym Up exec python ~/.config/i3/resize.py up 50 
+        bindsym Right exec python ~/.config/i3/resize.py right 50 
+
+
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+        bindsym $mod+semicolon mode "default"
+}
+
+bindsym $mod+semicolon mode "resize"
+
+
+
+
+
+#########
+# i3BAR #
+#########
+
+bar {
+    position top
+    #output primary
+    colors {
+    background #000000
+    statusline #FFFFFF
+    separator  #666666
+
+    focused_workspace  #83CAFA #51A2DA #FFFFFF
+    active_workspace   #3C6EB4 #294172 #FFFFFF
+    inactive_workspace #8C8C8C #4C4C4C #888888
+    urgent_workspace   #EC69A0 #DB3279 #FFFFFF
+    binding_mode       #b691d3 #A07CBC #FFFFFF
+    }
+    status_command i3status
+}
+
+
+
+########################
+# FONTS AND APPEARANCE #
+########################
+
+# jetbrains mono font set
+font pango:JetBrains Mono 14
+#font pango:monospace 12
+
+# colors
+# class                 border  bground text    indicator child_border
+client.focused          #83CAFA #51A2DA #FFFFFF #83CAFA   #51A2DA
+client.focused_inactive #8C8C8C #4C4C4C #FFFFFF #4C4C4C   #8C8C8C
+client.unfocused        #4C4C4C #222222 #888888 #292D2E   #222222
+client.urgent           #EC69A0 #DB3279 #FFFFFF #DB3279   #DB3279
+client.placeholder      #000000 #0C0C0C #FFFFFF #000000   #0C0C0C
+
+client.background       #FFFFFF
